@@ -1,4 +1,4 @@
-package org.example;
+package org.example.tareapoo;
     /**
      * Define el comportamiento que todas clases que implementen la interfaz
      * deben cumplir, saber dibujarse y saber rellanar sus contornos

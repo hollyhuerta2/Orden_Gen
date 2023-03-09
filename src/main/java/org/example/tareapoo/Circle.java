@@ -1,8 +1,7 @@
-package org.example;
+package org.example.tareapoo;
 
-import java.util.Objects;
 
-    /**
+/**
      * Representa un objeto circulo que implementa las interfaces Draw y Shape
      * por lo tanto, está oblidada a implementar los métodos que estas definen
      *

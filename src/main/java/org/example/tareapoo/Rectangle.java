@@ -1,7 +1,6 @@
-package org.example;
-import java.util.Objects;
+package org.example.tareapoo;
 
-    /**
+/**
      * Representa un objeto rectangulo que implementa las interfaces Draw y Shape
      * por lo tanto, está oblidada a implementar los métodos que estas definen.
      *

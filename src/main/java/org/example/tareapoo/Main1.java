@@ -1,6 +1,6 @@
-package org.example;
+package org.example.tareapoo;
 
-    public class Main1 {
+public class Main1 {
 
         public static void main (String [] args) {
             Circle circle1 = new Circle (10, 10, 20);
