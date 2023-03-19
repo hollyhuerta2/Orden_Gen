@@ -12,7 +12,7 @@ public class MyMarvelCollection implements Iterable<Film> {
     }
 
     public Film get (int index) {
-        return get(1);
+        return null;
     }
 
     @Override
