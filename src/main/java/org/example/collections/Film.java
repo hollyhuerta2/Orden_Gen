@@ -4,9 +4,6 @@ public class Film {
     private String title;
     private int year;
 
-    public Film(){
-    }
-
     public Film (String title, int year) {
         this.title = title;
         this.year = year;
