@@ -2,11 +2,7 @@ package org.example.segundoparcial;
 
 //package mx.uv.fiee.iinf.poo.demos.clientsocketv2;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
@@ -48,10 +44,19 @@ public class Client {
             // para ser enviadas, para ellos utilizamos un BufferedReader
             BufferedReader buff = new BufferedReader (in);
 
+
             // Variables de control
             // line1, almacena la entrada del usuario
             // line2, lee el mensaje remoto entrante
             String line1 = "", line2 = "";
+            File file = new File("Interstellar.txt");
+            byte[] fileBytes = new byte[(int) file.length()];
+            FileInputStream fileInputStream = new FileInputStream(file);
+            fileInputStream.read(fileBytes);
+
+            dos.write(fileBytes);
+            dos.flush();
+
 
             /**
              * Para realizar lectura y envíos recurrentes, utilizamos un ciclo.
@@ -72,12 +77,12 @@ public class Client {
                 // el flujo de la aplicación se bloquea en este punto, hasta que llega algún dato
                 line2 = din.readUTF ();
                 System.out.println ("Server says: " + line2); // coloca el mensaje entrante en la consola
-
             }
 
             // cerramos los flujos de entrada y salida
             din.close ();
             dos.close ();
+            fileInputStream.close();
             socket.close (); // y terminamos la conexión
 
         } catch (IOException ex) {

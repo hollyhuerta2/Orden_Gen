@@ -2,11 +2,7 @@ package org.example.segundoparcial;
 
 //package mx.uv.fiee.iinf.poo.demos.serversocketv2;
 
-import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +31,7 @@ public class Server {
             ServerSocket server = new ServerSocket (PORT);
             // esperamos a que se realice una conexión, bloqueando el flujo de la aplicación
             Socket socket = server.accept ();
+            byte[] buffer = new byte[1024];
 
             // creamos los objetos DataInputStream y DataOutputStream, usando el flujo de entrada
             // y salida del socket
@@ -50,36 +47,45 @@ public class Server {
             // pero lo que necesitamos es leer bloques (líneas) completas y se almacen en memoria
             // para ser enviadas, para ellos utilizamos un BufferedReader
             BufferedReader buff = new BufferedReader (in);
+            FileOutputStream fileOutputStream = new FileOutputStream("archivoCliente.txt");
+            int bytesRead;
+            while ((bytesRead = din.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, bytesRead);
+            }
+            fileOutputStream.close();
+
 
             // variables de control
             // line1, lee el mensaje remoto entrante
             // line2, almacena la entrada del usuario
             String line1 = "", line2 = "";
 
-            /**
-             * Para realizar lectura y envíos recurrentes, utilizamos un ciclo.
-             *
-             * La aplicación se detiene cuando el usuario teclea "stop"
-             */
-            while (!line1.equals ("stop")) {
-                // lee los bytes entrantes de la conexión como caracteres unicode,
-                // el flujo de la aplicación se detiene esperando la llegada de datos
-                line1 = din.readUTF ();
-                System.out.println ("Client says " + line1);
+                /**
+                 * Para realizar lectura y envíos recurrentes, utilizamos un ciclo.
+                 *
+                 * La aplicación se detiene cuando el usuario teclea "stop"
+                 */
+                while (!line1.equals("stop")) {
+                    // lee los bytes entrantes de la conexión como caracteres unicode,
+                    // el flujo de la aplicación se detiene esperando la llegada de datos
+                    line1 = din.readUTF();
+                    System.out.println("Client says: " + line1);
 
-                System.out.print ("Response: ");
-                // lee la entrada del usuario, el flujo de la aplicación se detiene
-                line2 = buff.readLine ();
+                    System.out.print("Response: ");
+                    // lee la entrada del usuario, el flujo de la aplicación se detiene
+                    line2 = buff.readLine();
 
-                // la entrada del usuario es codificada a caracteres unicode,
-                // y coloca en el buffer de salida de la conexión
-                dos.writeUTF (line2);
-                dos.flush (); // envía los bytes pendientes de salida
-            }
+                    // la entrada del usuario es codificada a caracteres unicode,
+                    // y coloca en el buffer de salida de la conexión
+                    dos.writeUTF(line2);
+                    dos.flush(); // envía los bytes pendientes de salida
+                }
 
             // cerramos los flujos de entrada y salida
-            din.close ();
+
             dos.close ();
+            din.close ();
+            socket.close();
             server.close (); // y finalmente la conexión
         } catch (IOException ex) {
             ex.printStackTrace ();
