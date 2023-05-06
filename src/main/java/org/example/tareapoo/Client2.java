@@ -9,65 +9,54 @@ public class Client2 {
     public static int SERVER_PORT = 9888;
 
     public static void main(String[] args) {
-        try {
-            // creamos el socket tipo cliente
-            Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+        try (Socket socket = new Socket(SERVER_IP, SERVER_PORT);
+             FileInputStream fileInputStream = new FileInputStream("Interstellar.txt");
+             OutputStream outputStream = socket.getOutputStream();
+             DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+             InputStream inputStream = socket.getInputStream();
+             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+             InputStreamReader in = new InputStreamReader(System.in, StandardCharsets.UTF_8);
+             BufferedReader buff = new BufferedReader(in)) {
 
-            // creamos el objeto OutputStream para enviar datos binarios al servidor
-            OutputStream outputStream = socket.getOutputStream();
-            DataOutputStream dataOutputStream = new DataOutputStream(outputStream);
+            sendFileToServer(fileInputStream, dataOutputStream);
 
-            // leemos el archivo que queremos enviar al servidor
-            FileInputStream fileInputStream = new FileInputStream("Interstellar.txt");
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                dataOutputStream.write(buffer, 0, bytesRead);
-            }
+            String response = receiveResponseFromServer(socket, bufferedReader);
 
-            // notificamos al servidor que hemos terminado de enviar el archivo
-            dataOutputStream.flush();
-            socket.shutdownOutput();
+            handleUserInputAndServerResponse(socket, buff, dataOutputStream, bufferedReader);
 
-            // creamos los flujos de entrada para recibir mensajes del servidor
-            DataInputStream din = new DataInputStream(socket.getInputStream());
-            InputStreamReader in = new InputStreamReader(System.in, StandardCharsets.UTF_8);
-            BufferedReader buff = new BufferedReader(in);
-
-            String line1 = "", line2 = "";
-            while (!line1.equals("stop")) {
-                System.out.print("Message: ");
-
-                // lee la entrada del usuario mediante la consola del sistema
-                line1 = buff.readLine();
-
-                // escribe la entrada del usuario en el buffer del flujo de salida
-                DataOutputStream dos = new DataOutputStream(socket.getOutputStream());
-                dos.writeUTF(line1);
-                dos.flush(); // envía los bytes pendientes alojados en el flujo de salida
-
-                // espera la respuesta del equipo remoto
-                // el flujo de la aplicación se bloquea en este punto, hasta que llega algún dato
-                line2 = din.readUTF();
-                System.out.println("Server says: " + line2); // coloca el mensaje entrante en la consola
-            }
-
-            // leemos la respuesta del servidor
-            InputStream inputStream = socket.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            String response = bufferedReader.readLine();
             System.out.println("Server response: " + response);
-
-            // cerramos los flujos de entrada y salida
-            din.close();
-            dataOutputStream.close();
-            outputStream.close();
-            fileInputStream.close();
-            bufferedReader.close();
-            inputStream.close();
-            socket.close();
         } catch (IOException ex) {
             ex.printStackTrace();
+        }
+    }
+    private static String receiveResponseFromServer(Socket socket, BufferedReader bufferedReader) throws IOException {
+        String response = bufferedReader.readLine();
+        return response;
+    }
+
+    private static void sendFileToServer(FileInputStream fileInputStream, DataOutputStream dataOutputStream) throws IOException {
+        byte[] buffer = new byte[4096];
+        int bytesRead;
+        while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+            dataOutputStream.write(buffer, 0, bytesRead);
+        }
+        dataOutputStream.flush();
+        // notificamos al servidor que hemos terminado de enviar el archivo
+       // socket.shutdownOutput();
+    }
+
+
+
+    private static void handleUserInputAndServerResponse(Socket socket, BufferedReader buff, DataOutputStream dataOutputStream, BufferedReader bufferedReader) throws IOException {
+        String userInput = "";
+        String serverResponse = "";
+        while (!userInput.equals("stop")) {
+            System.out.print("Message: ");
+            userInput = buff.readLine();
+            dataOutputStream.writeUTF(userInput);
+            dataOutputStream.flush();
+            serverResponse = bufferedReader.readLine();
+            System.out.println("Server says: " + serverResponse);
         }
     }
 }
