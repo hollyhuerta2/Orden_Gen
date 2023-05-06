@@ -7,6 +7,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
+
 /**
  * En esta versión del servidor se permite una conexión uno a uno
  * recibiendo mensajes del cliente y dando la capacidad al usuario de
@@ -47,12 +48,6 @@ public class Server {
             // pero lo que necesitamos es leer bloques (líneas) completas y se almacen en memoria
             // para ser enviadas, para ellos utilizamos un BufferedReader
             BufferedReader buff = new BufferedReader (in);
-            FileOutputStream fileOutputStream = new FileOutputStream("archivoCliente.txt");
-            int bytesRead;
-            while ((bytesRead = din.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, bytesRead);
-            }
-            fileOutputStream.close();
 
 
             // variables de control
@@ -80,11 +75,21 @@ public class Server {
                     dos.writeUTF(line2);
                     dos.flush(); // envía los bytes pendientes de salida
                 }
+            FileOutputStream fileOutputStream = new FileOutputStream("archivoCliente.txt");
+            int bytesRead;
+            while ((bytesRead = din.read(buffer)) != -1) {
+                fileOutputStream.write(buffer, 0, bytesRead);
+            }
+            fileOutputStream.close();
+            OutputStream outputStream = socket.getOutputStream();
+            outputStream.write("Archivo recibido exitosamente".getBytes(StandardCharsets.UTF_8));
+            outputStream.flush();
 
             // cerramos los flujos de entrada y salida
 
             dos.close ();
             din.close ();
+            outputStream.close();
             socket.close();
             server.close (); // y finalmente la conexión
         } catch (IOException ex) {
