@@ -52,10 +52,6 @@ public class Client {
             File file = new File("Interstellar.txt");
             byte[] fileBytes = new byte[(int) file.length()];
             FileInputStream fileInputStream = new FileInputStream(file);
-            fileInputStream.read(fileBytes);
-
-            dos.write(fileBytes);
-            dos.flush();
 
 
             /**
@@ -64,19 +60,25 @@ public class Client {
              * La aplicación se detiene cuando el usuario teclea "stop"
              */
             while (!line1.equals ("stop")) {
-                System.out.print ("Message: ");
+                if(line2.equals("stop")) {
+                    fileInputStream.read(fileBytes);
+                    dos.write(fileBytes);
+                    dos.flush();
+                }
+                    System.out.print("Message: ");
 
-                // lee la entrada del usuario mediante la consola del sistema
-                line1 = buff.readLine ();
+                    // lee la entrada del usuario mediante la consola del sistema
+                    line1 = buff.readLine();
 
-                // escribe la entradad del usuario en el buffer del flujo de salida
-                dos.writeUTF (line1);
-                dos.flush (); // envía los bytes pendientes alojados en el flujo de salida
+                    // escribe la entradad del usuario en el buffer del flujo de salida
+                    dos.writeUTF(line1);
+                    dos.flush(); // envía los bytes pendientes alojados en el flujo de salida
 
-                // espera la respuesta del equipo remoto
-                // el flujo de la aplicación se bloquea en este punto, hasta que llega algún dato
-                line2 = din.readUTF ();
-                System.out.println ("Server says: " + line2); // coloca el mensaje entrante en la consola
+                    // espera la respuesta del equipo remoto
+                    // el flujo de la aplicación se bloquea en este punto, hasta que llega algún dato
+                    line2 = din.readUTF();
+                    System.out.println("Server says: " + line2); // coloca el mensaje entrante en la consola
+
             }
 
             // cerramos los flujos de entrada y salida

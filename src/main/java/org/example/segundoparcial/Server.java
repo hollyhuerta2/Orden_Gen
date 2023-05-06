@@ -54,6 +54,7 @@ public class Server {
             // line1, lee el mensaje remoto entrante
             // line2, almacena la entrada del usuario
             String line1 = "", line2 = "";
+            FileOutputStream fileOutputStream = new FileOutputStream("archivoCliente.txt");
 
                 /**
                  * Para realizar lectura y envíos recurrentes, utilizamos un ciclo.
@@ -61,25 +62,28 @@ public class Server {
                  * La aplicación se detiene cuando el usuario teclea "stop"
                  */
                 while (!line1.equals("stop")) {
-                    // lee los bytes entrantes de la conexión como caracteres unicode,
-                    // el flujo de la aplicación se detiene esperando la llegada de datos
-                    line1 = din.readUTF();
-                    System.out.println("Client says: " + line1);
+                    if(line2.equals("stop")) {
+                        int bytesRead;
+                        while ((bytesRead = din.read(buffer)) != -1) {
+                            fileOutputStream.write(buffer, 0, bytesRead);
+                        }
+                    }
+                        // lee los bytes entrantes de la conexión como caracteres unicode,
+                        // el flujo de la aplicación se detiene esperando la llegada de datos
+                        line1 = din.readUTF();
+                        System.out.println("Client says: " + line1);
 
-                    System.out.print("Response: ");
-                    // lee la entrada del usuario, el flujo de la aplicación se detiene
-                    line2 = buff.readLine();
+                        System.out.print("Response: ");
+                        // lee la entrada del usuario, el flujo de la aplicación se detiene
+                        line2 = buff.readLine();
 
-                    // la entrada del usuario es codificada a caracteres unicode,
-                    // y coloca en el buffer de salida de la conexión
-                    dos.writeUTF(line2);
-                    dos.flush(); // envía los bytes pendientes de salida
+                        // la entrada del usuario es codificada a caracteres unicode,
+                        // y coloca en el buffer de salida de la conexión
+                        dos.writeUTF(line2);
+                        dos.flush(); // envía los bytes pendientes de salida
+
                 }
-            FileOutputStream fileOutputStream = new FileOutputStream("archivoCliente.txt");
-            int bytesRead;
-            while ((bytesRead = din.read(buffer)) != -1) {
-                fileOutputStream.write(buffer, 0, bytesRead);
-            }
+
             fileOutputStream.close();
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write("Archivo recibido exitosamente".getBytes(StandardCharsets.UTF_8));
